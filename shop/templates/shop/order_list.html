@@ -1,0 +1,37 @@
+{% extends 'shop/base.html' %}
+{% block content %}
+<h2 class="mb-4">Список всех заказов (для Менеджера)</h2>
+<div class="table-responsive bg-white p-3 rounded shadow-sm">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>ID Заказа</th>
+                <th>Дата заказа</th>
+                <th>Дата доставки</th>
+                <th>Код получения</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td><strong>№ {{ order.id }}</strong></td>
+                <td>{{ order.order_date }}</td>
+                <td>{{ order.order_delivery }}</td>
+                <td><span class="badge bg-secondary fs-6">{{ order.code }}</span></td>
+                <td>
+                    <span class="badge {% if order.order_status.id == 1 %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                        {{ order.order_status.name }}
+                    </span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">Заказов в базе нет.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<a href="{% url 'product_list' %}" class="btn btn-primary mt-3">Назад к товарам</a>
+{% endblock %}

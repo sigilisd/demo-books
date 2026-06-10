@@ -1,0 +1,16 @@
+{% extends 'shop/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4 shadow-sm">
+            <h3>{{ title }}</h3>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-success w-100 mt-3">Сохранить</button>
+                <a href="{% url 'product_list' %}" class="btn btn-secondary w-100 mt-2">Отмена</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

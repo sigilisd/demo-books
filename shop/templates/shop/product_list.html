@@ -1,0 +1,232 @@
+{% extends 'shop/base.html' %} 
+{% load static %}
+
+{% block content %}
+<style>
+    .styleguide-container {
+        /* Принудительно устанавливаем шрифт Comic Sans MS для всей формы */
+        font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif !important;
+        /* Основной фон — белый цвет */
+        background-color: #FFFFFF; 
+        color: #000000;
+        min-height: 100vh;
+    }
+
+    /* Дополнительный фон по ТЗ (#ABCFCE) */
+    .bg-additional {
+        background-color: #ABCFCE !important;
+    }
+
+    /* Целевое действие / Акцентирование внимания по ТЗ (#546F94) */
+    .btn-target-action {
+        background-color: #546F94 !important;
+        border-color: #546F94 !important;
+        color: #FFFFFF !important;
+        font-weight: bold;
+    }
+    .btn-target-action:hover {
+        background-color: #435875 !important;
+        border-color: #435875 !important;
+        color: #FFFFFF !important;
+    }
+    
+    /* Стилизация шапки таблицы под цвет акцента */
+    .table-accent-header {
+        background-color: #546F94 !important;
+        color: #FFFFFF !important;
+    }
+</style>
+
+<div class="styleguide-container p-3">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div class="d-flex align-items-center gap-3">
+            <h2 class="mb-0 fw-bold">Список книг</h2>
+        </div>
+        <div>
+            {% if role_id == 1 %}
+                <a href="{% url 'product_create' %}" class="btn btn-target-action me-2">Добавить товар</a>
+            {% endif %}
+            {% if role_id == 1 or role_id == 2 %}
+                <a href="{% url 'order_list' %}" class="btn btn-outline-secondary">Заказы</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if role_id == 1 or role_id == 2 %}
+    <div class="card p-3 mb-4 shadow-sm bg-additional border-0">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <input type="text" id="searchInput" class="form-control" placeholder="Поиск по названию...">
+            </div>
+            <div class="col-md-3">
+                <select id="categorySelect" class="form-select">
+                    <option value="">Все категории</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}">{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="manufacturerSelect" class="form-select">
+                    <option value="">Все производители</option>
+                    {% for man in manufacturers %}
+                        <option value="{{ man.id }}">{{ man.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="sortSelect" class="form-select">
+                    <option value="">Без сортировки</option>
+                    <option value="asc">Цена (возрастание)</option>
+                    <option value="desc">Цена (убывание)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card shadow-sm border-0 bg-white">
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle mb-0">
+                <thead class="table-accent-header">
+                    <tr>
+                        <th style="width: 100px;">Фото</th>
+                        <th>Категория</th>
+                        <th>Название книги</th>
+                        <th>Описание</th>
+                        <th>Производитель</th>
+                        <th>Поставщик</th>
+                        <th>Скидка</th>
+                        <th>Остаток</th>
+                        <th style="width: 180px;">Цена</th>
+                        {% if role_id == 1 %}
+                        <th style="width: 200px;">Действия</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    {% for product in products %}
+                    
+                    <tr class="product-row" 
+                        data-name="{{ product.name|lower }}" 
+                        data-category="{{ product.category.id }}" 
+                        data-manufacturer="{{ product.manufacturer.id }}" 
+                        data-price="{{ product.final_price }}"
+                        style="{% if product.amount == 0 %}background-color: #ADD8E6; color: black;{% elif product.discount > 25 %}background-color: #23E1EF; color: black;{% elif product.discount > 15 %}background-color: #2E8B57; color: white;{% endif %}">
+                        
+                        <td class="text-center">
+                            {% if product.photo %}
+                                <img src="{% static 'img/' %}{{ product.photo }}" alt="Обложка" style="height: 60px; max-width: 80px; object-fit: contain;">
+                            {% else %}
+                                <img src="{% static 'img/picture.png' %}" alt="Нет фото" style="height: 60px; max-width: 80px; object-fit: contain;">
+                            {% endif %}
+                        </td>
+
+                        <td>{{ product.category.name|default:product.category }}</td>
+                        <td><strong>{{ product.name }}</strong></td>
+                        <td><small class="text-wrap">{{ product.description|default:"Описание отсутствует."|truncatechars:70 }}</small></td>
+                        <td>{{ product.manufacturer.name|default:product.manufacturer }}</td>
+                        <td>{{ product.provider.name|default:product.provider }}</td>
+                        <td>{{ product.discount }}%</td>
+                        <td>{{ product.amount }} шт.</td>
+                        
+                        <td>
+                            {% if product.discount > 0 %}
+                                <span style="text-decoration: line-through; color: red; font-size: 0.9em; margin-right: 5px;">
+                                    {{ product.price }} ₽
+                                </span>
+                                <span style="color: black; font-weight: bold;">
+                                    {{ product.final_price }} ₽
+                                </span>
+                            {% else %}
+                                <span style="font-weight: 500; {% if product.discount > 15 and product.discount <= 25 %}color: white;{% endif %}">{{ product.price }} ₽</span>
+                            {% endif %}
+                        </td>
+                        
+                        {% if role_id == 1 %}
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'product_update' product.id %}" class="btn btn-warning btn-sm">Редактировать</a>
+                                <a href="{% url 'product_delete' product.id %}" class="btn btn-danger btn-sm">Удалить</a>
+                            </div>
+                        </td>
+                        {% endif %}
+                        
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="11" class="text-center py-4 text-muted">
+                            Товары не найдены.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    
+                    <tr id="emptyMessageRow" style="display: none;">
+                        <td colspan="11" class="text-center py-4 text-muted">
+                            Товары с такими параметрами не найдены.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const categorySelect = document.getElementById('categorySelect');
+    const manufacturerSelect = document.getElementById('manufacturerSelect');
+    const sortSelect = document.getElementById('sortSelect');
+    const tableBody = document.getElementById('productTableBody');
+    
+    const originalRows = Array.from(tableBody.querySelectorAll('.product-row'));
+
+    function updateTable() {
+        const searchQuery = searchInput.value.toLowerCase().trim();
+        const categoryFilter = categorySelect.value;
+        const manufacturerFilter = manufacturerSelect.value;
+        const sortOrder = sortSelect.value;
+
+        // 1. Фильтрация и поиск одновременно
+        originalRows.forEach(row => {
+            const name = row.dataset.name || '';
+            const category = row.dataset.category || '';
+            const manufacturer = row.dataset.manufacturer || '';
+
+            const matchesSearch = name.includes(searchQuery);
+            const matchesCategory = !categoryFilter || category === categoryFilter;
+            const matchesManufacturer = !manufacturerFilter || manufacturer === manufacturerFilter;
+
+            if (matchesSearch && matchesCategory && matchesManufacturer) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // 2. Сортировка по цене (без потери фильтров и фокуса)
+        if (sortOrder === 'asc' || sortOrder === 'desc') {
+            originalRows.sort((a, b) => {
+                const priceA = parseFloat(a.dataset.price) || 0;
+                const priceB = parseFloat(b.dataset.price) || 0;
+                return sortOrder === 'asc' ? priceA - priceB : priceB - priceA;
+            });
+        }
+
+        // Перерисовываем строки в DOM
+        originalRows.forEach(row => tableBody.appendChild(row));
+
+        // Если скрыты абсолютно все строки — показываем плашку "Ничего не найдено"
+        const hasVisibleRows = originalRows.some(row => row.style.display !== 'none');
+        document.getElementById('emptyMessageRow').style.display = hasVisibleRows ? 'none' : '';
+    }
+
+    if (searchInput) searchInput.addEventListener('input', updateTable);
+    if (categorySelect) categorySelect.addEventListener('change', updateTable);
+    if (manufacturerSelect) manufacturerSelect.addEventListener('change', updateTable);
+    if (sortSelect) sortSelect.addEventListener('change', updateTable);
+});
+</script>
+{% endblock %}

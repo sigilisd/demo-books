@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ООО ЧитайГород</title>
+    <link rel="icon" type="image/png" href="{% static 'img/icon.ico' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'product_list' %}">
+            <img src="{% static 'img/icon.png' %}" alt="Логотип" height="90" class="me-2">
+            <span>ЧитайГород</span>
+            </a>
+            <div class="navbar-nav ms-auto">
+                {% if request.session.user_name %}
+                    <span class="navbar-text text-white me-3">Вы вошли как: <strong>{{ request.session.user_name }}</strong></span>
+                    {% if request.session.role_id == 2 %}
+                        <a class="nav-link text-warning" href="{% url 'order_list' %}">Просмотр заказов</a>
+                    {% endif %}
+                    <a class="btn btn-outline-danger btn-sm" href="{% url 'logout' %}">Выйти</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

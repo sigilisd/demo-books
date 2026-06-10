@@ -1,0 +1,12 @@
+{% extends 'shop/base.html' %}
+{% block content %}
+<div class="card p-4 text-center shadow-sm mx-auto" style="max-width: 500px;">
+    <h3>Вы уверены, что хотите удалить товар?</h3>
+    <p class="text-danger fw-bold">"{{ product.name }}"</p>
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger w-100 mb-2">Да, удалить</button>
+        <a href="{% url 'product_list' %}" class="btn btn-secondary w-100">Отмена</a>
+    </form>
+</div>
+{% endblock %}
