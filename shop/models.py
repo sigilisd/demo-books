@@ -81,7 +81,7 @@ class PickupPoints(models.Model):
         db_table = 'pickup_points'
 
     def __str__(self):
-        return self.name if self.name else "Без названия"
+            return ", ".join(f"{p} {v}" for p, v in [('г.', self.city), ('ул.', self.street), ('д.', self.building)] if v)
 
 
 class Products(models.Model):
@@ -151,3 +151,6 @@ class Users(models.Model):
     class Meta:
         managed = False
         db_table = 'users'
+
+    def __str__(self):
+            return f"{self.last_name or ''} {self.first_name or ''}".strip()

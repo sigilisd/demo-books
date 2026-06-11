@@ -6,6 +6,8 @@
         <thead>
             <tr>
                 <th>ID Заказа</th>
+                <th>ФИО пользователя</th>
+                <th>Пункт выдачи</th>
                 <th>Дата заказа</th>
                 <th>Дата доставки</th>
                 <th>Код получения</th>
@@ -16,6 +18,8 @@
             {% for order in orders %}
             <tr>
                 <td><strong>№ {{ order.id }}</strong></td>
+                <td>{{ order.user}}</td>
+                <td>{{ order.pickup_point }}</td>
                 <td>{{ order.order_date }}</td>
                 <td>{{ order.order_delivery }}</td>
                 <td><span class="badge bg-secondary fs-6">{{ order.code }}</span></td>
