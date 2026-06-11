@@ -17,9 +17,6 @@
             <div class="navbar-nav ms-auto">
                 {% if request.session.user_name %}
                     <span class="navbar-text text-white me-3">Вы вошли как: <strong>{{ request.session.user_name }}</strong></span>
-                    {% if request.session.role_id == 2 %}
-                        <a class="nav-link text-warning" href="{% url 'order_list' %}">Просмотр заказов</a>
-                    {% endif %}
                     <a class="btn btn-outline-danger btn-sm" href="{% url 'logout' %}">Выйти</a>
                 {% endif %}
             </div>
